@@ -480,3 +480,10 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Development
+.explain/
+docs/
+Ecommerce.API/appsettings.Development.json
+.mock/
+.vscode/

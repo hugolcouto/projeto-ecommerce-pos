@@ -1,6 +1,6 @@
 using Ecommerce.Core.Entities;
 
-namespace Ecommerce.Core.Repository;
+namespace Ecommerce.Core.Repositories;
 
 public interface ICustomerRepository
 {

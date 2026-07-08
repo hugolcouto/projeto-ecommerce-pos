@@ -1,10 +1,14 @@
+using Ecommerce.Application;
+using Ecommerce.Infrastructure;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddInfrastructure(builder.Configuration).AddApplication();
 
 builder.Services.AddControllers();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -15,7 +19,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
-    app.MapGet("/", () => Results.Redirect("/scalar"));
+    app.MapGet("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
 }
 
 app.UseHttpsRedirection();

@@ -8,5 +8,5 @@ public enum OrderStatus
     Shipping,
     Shipped,
     Delivered,
-    Cancelled
+    Cancelled,
 }

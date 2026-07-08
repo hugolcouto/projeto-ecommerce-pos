@@ -1,8 +1,8 @@
 using Ecommerce.Core.Entities;
 
-namespace Ecommerce.Core.Repository;
+namespace Ecommerce.Core.Repositories;
 
-interface IProductCategoryRepository
+public interface IProductCategoryRepository
 {
     Task<Guid> Create(ProductCategory productCategory);
 }

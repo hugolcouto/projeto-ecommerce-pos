@@ -487,3 +487,7 @@ docs/
 Ecommerce.API/appsettings.Development.json
 .mock/
 .vscode/
+appsettings.Development.json
+Ecommerce.API/appsettings.Development.json
+azurite*/
+azurite-data/AzuriteConfig

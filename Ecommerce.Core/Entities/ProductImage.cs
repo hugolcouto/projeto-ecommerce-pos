@@ -6,10 +6,8 @@ public class ProductImage : BaseEntity
 {
     public ProductImage() { }
 
-    public ProductImage(string identifier, string path, bool isVisible, Guid idProduct)
+    public ProductImage(bool isVisible, Guid idProduct)
     {
-        Identifier = identifier;
-        Path = path;
         IsVisible = isVisible;
         IdProduct = idProduct;
     }
@@ -25,4 +23,10 @@ public class ProductImage : BaseEntity
 
     [Required]
     public Guid IdProduct { get; set; }
+
+    public void ConfigureIdentifier(string fileExtension)
+    {
+        Identifier = Id.ToString();
+        Path = $"{IdProduct}/{Id}.{fileExtension}";
+    }
 }

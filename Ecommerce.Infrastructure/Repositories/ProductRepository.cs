@@ -22,6 +22,12 @@ public class ProductRepository : IProductRepository
         return product.Id;
     }
 
+    public async Task CreateImage(ProductImage productImage)
+    {
+        await _context.ProductImages.AddAsync(productImage);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<List<Product>> GetAll()
     {
         return await _context.Products.Where(p => !p.IsDeleted).ToListAsync();
@@ -30,5 +36,12 @@ public class ProductRepository : IProductRepository
     public async Task<Product?> GetById(Guid id)
     {
         return await _context.Products.SingleOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task<ProductImage?> GetImageById(Guid id)
+    {
+        ProductImage? image = await _context.ProductImages.SingleOrDefaultAsync(i => i.Id == id);
+
+        return image;
     }
 }

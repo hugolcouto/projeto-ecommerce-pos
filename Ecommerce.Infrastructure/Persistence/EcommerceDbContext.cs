@@ -1,7 +1,7 @@
 using Ecommerce.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
+using Microsoft.EntityFrameworkCore.Metadata;
 namespace Ecommerce.Infrastructure.Persistence;
 
 public class EcommerceDbContext : DbContext
@@ -21,9 +21,9 @@ public class EcommerceDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes())
         {
-            foreach (var property in entityType.GetProperties())
+            foreach (IMutableProperty property in entityType.GetProperties())
             {
                 if (property.ClrType == typeof(DateTimeOffset))
                 {

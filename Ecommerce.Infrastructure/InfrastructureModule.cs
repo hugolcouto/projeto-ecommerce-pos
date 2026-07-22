@@ -1,4 +1,4 @@
-﻿using Ecommerce.Core.Events;
+﻿using Azure.Storage.Blobs;
 using Ecommerce.Core.Repositories;
 using Ecommerce.Infrastructure.Messaging;
 using Ecommerce.Infrastructure.Messaging.Consumers;
@@ -16,7 +16,11 @@ public static class InfrastructureModule
     {
         public IServiceCollection AddInfrastructure(IConfiguration configuration)
         {
-            services.AddData(configuration).AddRepositories().AddMessaging(configuration);
+            services
+                .AddData(configuration)
+                .AddRepositories()
+                .AddMessaging(configuration)
+                .AddStorage(configuration);
 
             return services;
         }
@@ -27,14 +31,19 @@ public static class InfrastructureModule
                 .AddScoped<ICustomerRepository, CustomerRepository>()
                 .AddScoped<IOrderRepository, OrderRepository>()
                 .AddScoped<IProductCategoryRepository, ProductCategoryRepository>()
-                .AddScoped<IProductRepository, ProductRepository>();
+                .AddScoped<IProductRepository, ProductRepository>()
+                .AddScoped<IStorageService, StorageService>();
 
             return services;
         }
 
         private IServiceCollection AddData(IConfiguration configuration)
         {
-            string dbConnectionString = configuration.GetConnectionString("SqlConnectionString")!;
+            string dbConnectionString =
+                configuration.GetConnectionString("SqlConnectionString")
+                ?? throw new InvalidOperationException(
+                    "Connection string 'SqlConnectionString' not found."
+                );
             services.AddDbContext<EcommerceDbContext>(options =>
                 options.UseNpgsql(dbConnectionString)
             );
@@ -51,6 +60,21 @@ public static class InfrastructureModule
             services.AddSingleton(rabbitMqSettings);
             services.AddSingleton<IEventPublisher, RabbitMqEventPublisher>();
             services.AddHostedService<OrderCreatedEventConsumer>();
+
+            return services;
+        }
+
+        private IServiceCollection AddStorage(IConfiguration configuration)
+        {
+            string connectionString =
+                configuration.GetConnectionString("BlobStorage")
+                ?? throw new InvalidOperationException("ConnectionString 'BlobStorage' not found");
+
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+
+            services.AddSingleton(blobServiceClient);
+
+            services.AddScoped<IStorageService, StorageService>();
 
             return services;
         }

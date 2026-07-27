@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Ecommerce.Core.Repositories;
+using Ecommerce.Infrastructure.Caching;
 using Ecommerce.Infrastructure.Messaging;
 using Ecommerce.Infrastructure.Messaging.Consumers;
 using Ecommerce.Infrastructure.Persistence;
@@ -20,7 +21,8 @@ public static class InfrastructureModule
                 .AddData(configuration)
                 .AddRepositories()
                 .AddMessaging(configuration)
-                .AddStorage(configuration);
+                .AddStorage(configuration)
+                .AddCache(configuration);
 
             return services;
         }
@@ -75,6 +77,39 @@ public static class InfrastructureModule
             services.AddSingleton(blobServiceClient);
 
             services.AddScoped<IStorageService, StorageService>();
+
+            return services;
+        }
+
+        private IServiceCollection AddCache(IConfiguration configuration)
+        {
+            string provider = configuration.GetValue<string>("Caching:Provider") ?? string.Empty;
+
+            if (provider == "Redis")
+            {
+                string connectionString =
+                    configuration.GetValue<string>("Caching:Redis:ConnectionString")
+                    ?? throw new InvalidOperationException(
+                        "Redis connection string not configured"
+                    );
+
+                string instanceName =
+                    configuration.GetValue<string>("Caching:Redis:InstanceName")
+                    ?? throw new InvalidOperationException("Redis instance name not configured");
+
+                services.AddStackExchangeRedisCache(o =>
+                {
+                    o.Configuration = connectionString;
+                    o.InstanceName = instanceName;
+                });
+
+                services.AddScoped<ICacheService, RedisCacheService>();
+            }
+            else
+            {
+                services.AddMemoryCache();
+                services.AddScoped<ICacheService, MemoryCacheService>();
+            }
 
             return services;
         }

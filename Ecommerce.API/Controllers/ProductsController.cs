@@ -1,10 +1,15 @@
+using System.IO.Compression;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Ecommerce.Application;
-using Ecommerce.Application.Commands.Products.DownloadProductImage;
+using Ecommerce.Application.Commands.Products.DownloadAllImagesForProduct;
+using Ecommerce.Application.Commands.Products.DownloadImageForProduct;
 using Ecommerce.Application.Commands.ProductsCommands.Products.CreateProduct;
 using Ecommerce.Application.Common;
+using Ecommerce.Application.Queries.Products.GetAllProducts;
+using Ecommerce.Application.Queries.Products.GetProductDetails;
 using Microsoft.AspNetCore.Mvc;
+using RabbitMQ.Client;
 
 namespace Ecommerce.API.Controllers;
 
@@ -73,5 +78,73 @@ public class ProductsController : ControllerBase
             return NotFound("Image not found");
 
         return File(result.Data!, "image/png");
+    }
+
+    [HttpGet("{id:guid}/images")]
+    public async Task<IActionResult> DownloadAllImages(Guid id)
+    {
+        DownloadAllImagesForProductQuery query = new(id);
+
+        ResultViewModel<List<Stream>> results = await _mediator.DispatchAsync<
+            DownloadAllImagesForProductQuery,
+            ResultViewModel<List<Stream>>
+        >(query);
+
+        List<Stream> streams = results.Data ?? [];
+
+        MemoryStream memoryStream = new();
+
+        using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+        {
+            foreach (var stream in streams)
+            {
+                ZipArchiveEntry? entry = zipArchive.CreateEntry(
+                    $"{Guid.NewGuid().ToString()}.jpeg"
+                );
+
+                using Stream? entryStream = entry.Open();
+
+                stream.CopyTo(entryStream);
+            }
+        }
+
+        memoryStream.Position = 0;
+
+        string zipFileName = $"image_{id}.zip";
+
+        return File(memoryStream, "application/zip", zipFileName);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> Details(Guid id)
+    {
+        GetProductDetailsQuery query = new(id);
+
+        ResultViewModel<ProductDetailsViewModel> response = await _mediator.DispatchAsync<
+            GetProductDetailsQuery,
+            ResultViewModel<ProductDetailsViewModel>
+        >(query);
+
+        if (response.IsSuccess is false)
+            return NotFound(response.Message);
+
+        return Ok(response);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        GetAllProductsQuery query = new();
+
+        ResultViewModel<List<GetAllProductQueryItemViewModel>>? response =
+            await _mediator.DispatchAsync<
+                GetAllProductsQuery,
+                ResultViewModel<List<GetAllProductQueryItemViewModel>>
+            >(query);
+
+        if (response.IsSuccess is false)
+            return BadRequest(response.Message);
+
+        return Ok(response);
     }
 }

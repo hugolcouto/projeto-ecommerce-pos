@@ -1,6 +1,6 @@
 using System;
 
-namespace Ecommerce.Application.Commands.Products.DownloadProductImage;
+namespace Ecommerce.Application.Commands.Products.DownloadImageForProduct;
 
 public class DownloadImageForProductQuery
 {

@@ -35,7 +35,10 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> GetById(Guid id)
     {
-        return await _context.Products.SingleOrDefaultAsync(p => p.Id == id);
+        return await _context
+            .Products.Include(p => p.Category)
+            .Include(p => p.Reviews)
+            .SingleOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<ProductImage?> GetImageById(Guid id)

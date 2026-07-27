@@ -15,7 +15,7 @@ public class ResultViewModel
     public bool IsSuccess { get; set; }
     public HttpStatusCode? ErrorCode { get; set; }
 
-    public static ResultViewModel Success() => new();
+    public static ResultViewModel Success(IEnumerable<Queries.Products.GetAllProducts.GetAllProductQueryItemViewModel> productsViewModel) => new();
     public static ResultViewModel Error(string message, HttpStatusCode errorCode)
         => new(message, false, errorCode);
 }

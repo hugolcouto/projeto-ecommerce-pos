@@ -1,4 +1,5 @@
 using System.Reflection.Metadata;
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 
@@ -33,5 +34,32 @@ public class StorageService : IStorageService
         Task<Azure.Response<BlobContentInfo>>? response = blobClient.UploadAsync(fileStream);
 
         return response is not null;
+    }
+
+    public async Task<List<Stream>> DownloadImages(string path)
+    {
+        List<Stream> streams = [];
+
+        await foreach (
+            BlobItem item in _blobContainerClient.GetBlobsAsync(
+                prefix: path,
+                traits: BlobTraits.None,
+                states: BlobStates.None,
+                cancellationToken: CancellationToken.None
+            )
+        )
+        {
+            BlobClient? blobClient = _blobContainerClient.GetBlobClient(item.Name);
+
+            MemoryStream stream = new();
+
+            Response? response = await blobClient.DownloadToAsync(stream);
+
+            stream.Position = 0;
+
+            streams.Add(stream);
+        }
+
+        return streams;
     }
 }

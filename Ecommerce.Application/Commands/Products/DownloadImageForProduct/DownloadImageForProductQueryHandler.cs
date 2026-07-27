@@ -4,7 +4,7 @@ using Ecommerce.Core.Entities;
 using Ecommerce.Core.Repositories;
 using Ecommerce.Infrastructure;
 
-namespace Ecommerce.Application.Commands.Products.DownloadProductImage;
+namespace Ecommerce.Application.Commands.Products.DownloadImageForProduct;
 
 public class DownloadImageForProductQueryHandler
     : IHandler<DownloadImageForProductQuery, ResultViewModel<Stream>>

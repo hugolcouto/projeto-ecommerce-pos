@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Text.Json.Serialization;
 using Ecommerce.Core.Enums;
 
 namespace Ecommerce.Core.Entities;
@@ -25,31 +26,29 @@ public class Order : BaseEntity
         Updates = [];
     }
 
-    [Required]
-    public Guid IdCostumer { get; private set; }
     public DateTimeOffset? ConfirmDate { get; private set; }
     public DateTimeOffset? ShippingDate { get; private set; }
 
     [Required]
+    [JsonInclude]
     public OrderStatus Status { get; private set; }
 
     [Required]
-    public Guid DeliveryAddressId { get; private set; }
+    public Guid DeliveryAddressId { get; init; }
 
     [Required]
-    public CustomerAddress DeliveryAddress { get; private set; }
+    public CustomerAddress DeliveryAddress { get; init; }
 
     [Required]
-    public decimal ShippingPrice { get; private set; }
+    public decimal ShippingPrice { get; init; }
 
     [Required]
-    public decimal TotalPrice { get; private set; }
+    public decimal TotalPrice { get; init; }
     public List<OrderItem> Items { get; private set; }
 
     public Customer Customer { get; private set; }
 
-    [Required]
-    public Guid IdCustomer { get; private set; }
+    public Guid IdCustomer { get; init; }
     public List<OrderUpdate> Updates { get; private set; } = [];
 
     public void MarkAsConfirmed()

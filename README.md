@@ -8,8 +8,8 @@ Projeto de estudos para desenvolvimento de back-end de plataforma de ecommerce u
 - [x] Implementando Handlers, Repositories, EF Core, e APIs
 - [x] Mensageria com RabbitMQ
 - [x] Upload de Arquivos com Blob Storage
-- [ ] Caching com Memória e Redis + EF com Postgres
-- [ ] Implementando carrinho de compras com Redis + LinkedIn
+- [x] Caching com Memória e Redis + EF com Postgres
+- [x] Implementando carrinho de compras com Redis + LinkedIn
 - [ ] Implementando cálculo de frete com API do Google
 - [ ] Rotinas com Hangfire + base para Pagamentos com Stripe
 - [ ] Implementando Pagamentos com Stripe

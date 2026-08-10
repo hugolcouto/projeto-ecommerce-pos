@@ -1,7 +1,5 @@
-using System;
 using System.Text;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore.Metadata;
 using RabbitMQ.Client;
 
 namespace Ecommerce.Infrastructure.Messaging;

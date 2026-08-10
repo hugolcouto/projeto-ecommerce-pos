@@ -55,4 +55,7 @@ public class CustomerAddress : BaseEntity
 
     [Required]
     public string RecipientName { get; set; }
+
+    public string GetFullAddress() =>
+        $"{AddressLine1} {AddressLine2} {ZipCode} {District} {State} {City}";
 }

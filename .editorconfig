@@ -10,3 +10,19 @@ end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = false
 insert_final_newline = false
+
+[*.cs]
+
+# 1. Define o grupo de símbolos (campos privados)
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+# 2. Define o estilo de nomenclatura (prefixo _ e camel_case)
+dotnet_naming_style.prefix_underscore_style.required_prefix = _
+dotnet_naming_style.prefix_underscore_style.capitalization = camel_case
+
+# 3. Define a regra que une o grupo ao estilo
+dotnet_naming_rule.private_fields_should_be_prefixed.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_prefixed.style = prefix_underscore_style
+# Severidade pode ser 'warning', 'error', 'suggestion', ou 'silent' [citation:11]
+dotnet_naming_rule.private_fields_should_be_prefixed.severity = warning

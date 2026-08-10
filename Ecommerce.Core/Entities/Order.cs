@@ -40,25 +40,30 @@ public class Order : BaseEntity
     public CustomerAddress DeliveryAddress { get; init; }
 
     [Required]
-    public decimal ShippingPrice { get; init; }
+    public decimal ShippingPrice { get; private set; }
 
     [Required]
     public decimal TotalPrice { get; init; }
-    public List<OrderItem> Items { get; private set; }
+    public List<OrderItem> Items { get; }
 
-    public Customer Customer { get; private set; }
+    public Customer Customer { get; }
 
     public Guid IdCustomer { get; init; }
-    public List<OrderUpdate> Updates { get; private set; } = [];
+    public List<OrderUpdate> Updates { get; } = [];
 
     public void MarkAsConfirmed()
     {
         if (Status != OrderStatus.Created)
-        {
-            Console.WriteLine($"[Order] Order is in invalid state for confirmation");
             throw new Exception("Order is in invalid state for confirmation");
-        }
 
         Status = OrderStatus.Confirmed;
+    }
+
+    public void SetShippingCost(decimal shippingCost)
+    {
+        if (Status is not OrderStatus.Created)
+            throw new InvalidOperationException("Order is invalid state for shipping");
+
+        ShippingPrice = shippingCost;
     }
 }

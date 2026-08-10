@@ -2,6 +2,7 @@ using System;
 using Ecommerce.Core.Entities;
 using Ecommerce.Core.Repositories;
 using Ecommerce.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Repositories;
 
@@ -29,4 +30,7 @@ public class CustomerRepository : ICustomerRepository
 
         return address.Id;
     }
+
+    public Task<CustomerAddress?> GetAddress(Guid id) =>
+        _context.CustomerAddresses.SingleOrDefaultAsync(c => c.IdCustomer == id);
 }

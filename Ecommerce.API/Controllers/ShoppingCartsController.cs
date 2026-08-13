@@ -9,14 +9,9 @@ namespace Ecommerce.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ShoppingCartsController : ControllerBase
+public class ShoppingCartsController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public ShoppingCartsController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
+    private readonly IMediator _mediator = mediator;
 
     [HttpGet("{idCustomer:guid}")]
     public async Task<IActionResult> Get(Guid idCustomer)

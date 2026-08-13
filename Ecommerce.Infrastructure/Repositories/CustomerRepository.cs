@@ -6,14 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Infrastructure.Repositories;
 
-public class CustomerRepository : ICustomerRepository
+public class CustomerRepository(EcommerceDbContext context) : ICustomerRepository
 {
-    private readonly EcommerceDbContext _context;
-
-    public CustomerRepository(EcommerceDbContext context)
-    {
-        _context = context;
-    }
+    private readonly EcommerceDbContext _context = context;
 
     public async Task<Guid> Create(Customer customer)
     {
@@ -33,4 +28,7 @@ public class CustomerRepository : ICustomerRepository
 
     public Task<CustomerAddress?> GetAddress(Guid id) =>
         _context.CustomerAddresses.SingleOrDefaultAsync(c => c.IdCustomer == id);
+
+    public Task<Customer?> GetById(Guid id) =>
+        _context.Customers.SingleOrDefaultAsync(c => c.Id == id);
 }

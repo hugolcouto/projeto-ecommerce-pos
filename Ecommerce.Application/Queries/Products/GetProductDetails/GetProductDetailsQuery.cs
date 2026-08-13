@@ -1,11 +1,6 @@
 namespace Ecommerce.Application.Queries.Products.GetProductDetails;
 
-public class GetProductDetailsQuery
+public class GetProductDetailsQuery(Guid idProduct)
 {
-    public GetProductDetailsQuery(Guid idProduct)
-    {
-        IdProduct = idProduct;
-    }
-
-    public Guid IdProduct { get; set; }
+    public Guid IdProduct { get; set; } = idProduct;
 }

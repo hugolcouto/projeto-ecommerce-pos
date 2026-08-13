@@ -7,21 +7,15 @@ using Ecommerce.Infrastructure.Repositories;
 
 namespace Ecommerce.Application.Queries.Products.GetProductDetails;
 
-public class GetProductDetailsQueryHandler
-    : IHandler<GetProductDetailsQuery, ResultViewModel<ProductDetailsViewModel>>
-{
-    private readonly IProductRepository _productRepository;
-    private readonly ICacheService _cacheService;
-    private const string CacheKeyPrefix = "product:";
-
-    public GetProductDetailsQueryHandler(
-        IProductRepository productRepository,
-        ICacheService cacheService
+public class GetProductDetailsQueryHandler(
+    IProductRepository productRepository,
+    ICacheService cacheService
     )
-    {
-        _productRepository = productRepository;
-        _cacheService = cacheService;
-    }
+        : IHandler<GetProductDetailsQuery, ResultViewModel<ProductDetailsViewModel>>
+{
+    private readonly IProductRepository _productRepository = productRepository;
+    private readonly ICacheService _cacheService = cacheService;
+    private const string CacheKeyPrefix = "product:";
 
     public async Task<ResultViewModel<ProductDetailsViewModel>> HandleAsync(
         GetProductDetailsQuery request

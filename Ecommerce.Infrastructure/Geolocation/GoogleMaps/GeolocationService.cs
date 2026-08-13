@@ -3,14 +3,9 @@ using Microsoft.Extensions.Options;
 
 namespace Ecommerce.Infrastructure.Geolocation;
 
-public class GeolocationService : IGeolocationService
+public class GeolocationService(IOptions<GeolocationSettings> options) : IGeolocationService
 {
-    private readonly GeolocationSettings _geolocationSettings;
-
-    public GeolocationService(IOptions<GeolocationSettings> options)
-    {
-        _geolocationSettings = options.Value;
-    }
+    private readonly GeolocationSettings _geolocationSettings = options.Value;
 
     public async Task<int> GetDistance(string origin, string destination)
     {

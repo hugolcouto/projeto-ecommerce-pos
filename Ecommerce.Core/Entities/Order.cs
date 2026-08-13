@@ -13,7 +13,6 @@ public class Order : BaseEntity
         Guid idCustomer,
         Guid deliveryAddressId,
         decimal shippingPrice,
-        decimal totalPrice,
         List<OrderItem> items
     )
     {
@@ -21,7 +20,6 @@ public class Order : BaseEntity
         Status = OrderStatus.Created;
         DeliveryAddressId = deliveryAddressId;
         ShippingPrice = shippingPrice;
-        TotalPrice = totalPrice;
         Items = items;
         Updates = [];
     }
@@ -43,7 +41,7 @@ public class Order : BaseEntity
     public decimal ShippingPrice { get; private set; }
 
     [Required]
-    public decimal TotalPrice { get; init; }
+    public decimal TotalPrice { get; set; }
     public List<OrderItem> Items { get; }
 
     public Customer Customer { get; }
@@ -51,12 +49,28 @@ public class Order : BaseEntity
     public Guid IdCustomer { get; init; }
     public List<OrderUpdate> Updates { get; } = [];
 
-    public void MarkAsConfirmed()
+    public void MarkAsPaymentPending()
     {
         if (Status != OrderStatus.Created)
-            throw new Exception("Order is in invalid state for confirmation");
+        {
+            Console.WriteLine("[ORDER] Order is in invalid state for payment pending");
+            throw new Exception("Order is in invalid state for payment pending");
+        }
 
-        Status = OrderStatus.Confirmed;
+        Status = OrderStatus.PaymentPending;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void MarkAsPaymentExpired()
+    {
+        if (Status != OrderStatus.PaymentPending)
+        {
+            Console.WriteLine("Order is in invalid state for payment expired");
+            throw new Exception("Order is in invalid state for payment expired");
+        }
+
+        Status = OrderStatus.PaymentExpired;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public void SetShippingCost(decimal shippingCost)
@@ -66,4 +80,6 @@ public class Order : BaseEntity
 
         ShippingPrice = shippingCost;
     }
+
+    public void SetTotalProductPrice(decimal totalPrice) => TotalPrice = totalPrice;
 }

@@ -6,20 +6,14 @@ using Ecommerce.Infrastructure;
 
 namespace Ecommerce.Application.Commands.Products.DownloadImageForProduct;
 
-public class DownloadImageForProductQueryHandler
-    : IHandler<DownloadImageForProductQuery, ResultViewModel<Stream>>
-{
-    private readonly IStorageService _storageService;
-    private readonly IProductRepository _productRepository;
-
-    public DownloadImageForProductQueryHandler(
-        IStorageService storageService,
-        IProductRepository productRepository
+public class DownloadImageForProductQueryHandler(
+    IStorageService storageService,
+    IProductRepository productRepository
     )
-    {
-        _storageService = storageService;
-        _productRepository = productRepository;
-    }
+        : IHandler<DownloadImageForProductQuery, ResultViewModel<Stream>>
+{
+    private readonly IStorageService _storageService = storageService;
+    private readonly IProductRepository _productRepository = productRepository;
 
     public async Task<ResultViewModel<Stream>> HandleAsync(DownloadImageForProductQuery request)
     {

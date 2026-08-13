@@ -2,15 +2,10 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Ecommerce.Infrastructure.Caching;
 
-public class MemoryCacheService : ICacheService
+public class MemoryCacheService(IMemoryCache cache) : ICacheService
 {
-    private readonly IMemoryCache _cache;
+    private readonly IMemoryCache _cache = cache;
     private readonly TimeSpan _defaultExpiration = TimeSpan.FromMinutes(10);
-
-    public MemoryCacheService(IMemoryCache cache)
-    {
-        _cache = cache;
-    }
 
     public Task<T?> GetAsync<T>(string key)
     {

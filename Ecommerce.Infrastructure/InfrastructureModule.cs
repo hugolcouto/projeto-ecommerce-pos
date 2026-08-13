@@ -1,12 +1,16 @@
-﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs;
 using Ecommerce.Core.Repositories;
+using Ecommerce.Infrastructure.BackgroundJobs;
 using Ecommerce.Infrastructure.Caching;
 using Ecommerce.Infrastructure.Geolocation;
 using Ecommerce.Infrastructure.Messaging;
 using Ecommerce.Infrastructure.Messaging.Consumers;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Repositories;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,7 +28,8 @@ public static class InfrastructureModule
                 .AddMessaging(configuration)
                 .AddStorage(configuration)
                 .AddCache(configuration)
-                .AddGeolocation(configuration);
+                .AddGeolocation(configuration)
+                .AddHangfireServices(configuration);
 
             return services;
         }
@@ -45,9 +50,7 @@ public static class InfrastructureModule
         {
             string dbConnectionString =
                 configuration.GetConnectionString("SqlConnectionString")
-                ?? throw new InvalidOperationException(
-                    "Connection string 'SqlConnectionString' not found."
-                );
+                ?? throw new InvalidOperationException("DB Connection strign not configured");
             services.AddDbContext<EcommerceDbContext>(options =>
                 options.UseNpgsql(dbConnectionString)
             );
@@ -129,6 +132,25 @@ public static class InfrastructureModule
 
                 services.AddScoped<IGeolocationService, GeolocationService>();
             }
+
+            return services;
+        }
+
+        private IServiceCollection AddHangfireServices(IConfiguration configuration)
+        {
+            string connectionString =
+                configuration.GetConnectionString("SqlConnectionString")
+                ?? throw new InvalidOperationException("DB Connection strign not configured");
+
+            services.AddHangfire(config =>
+            {
+                config
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                    .UseRecommendedSerializerSettings()
+                    .UsePostgreSqlStorage(o => o.UseNpgsqlConnection(connectionString));
+            });
+
+            services.AddHangfireServer();
 
             return services;
         }

@@ -2,22 +2,15 @@ using System.Net;
 
 namespace Ecommerce.Application.Common;
 
-public class ResultViewModel
-{
-    public ResultViewModel(
-        string message = "",
-        bool isSuccess = true,
-        HttpStatusCode? errorCode = null
+public class ResultViewModel(
+    string message = "",
+    bool isSuccess = true,
+    HttpStatusCode? errorCode = null
     )
-    {
-        Message = message;
-        IsSuccess = isSuccess;
-        ErrorCode = errorCode;
-    }
-
-    public string Message { get; set; }
-    public bool IsSuccess { get; set; }
-    public HttpStatusCode? ErrorCode { get; set; }
+{
+    public string Message { get; set; } = message;
+    public bool IsSuccess { get; set; } = isSuccess;
+    public HttpStatusCode? ErrorCode { get; set; } = errorCode;
 
     public static ResultViewModel Success(
         IEnumerable<Queries.Products.GetAllProducts.GetAllProductQueryItemViewModel> productsViewModel
@@ -27,20 +20,14 @@ public class ResultViewModel
         new(message, false, errorCode);
 }
 
-public class ResultViewModel<T> : ResultViewModel
+public class ResultViewModel<T>(
+    T? data,
+    string message = "",
+    bool isSuccess = true,
+    HttpStatusCode? errorCode = null
+    ) : ResultViewModel(message, isSuccess, errorCode)
 {
-    public ResultViewModel(
-        T? data,
-        string message = "",
-        bool isSuccess = true,
-        HttpStatusCode? errorCode = null
-    )
-        : base(message, isSuccess, errorCode)
-    {
-        Data = data;
-    }
-
-    public T? Data { get; set; }
+    public T? Data { get; set; } = data;
 
     public static ResultViewModel<T> Success(T data) => new(data);
 

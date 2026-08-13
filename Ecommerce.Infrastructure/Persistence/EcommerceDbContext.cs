@@ -4,11 +4,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.EntityFrameworkCore.Metadata;
 namespace Ecommerce.Infrastructure.Persistence;
 
-public class EcommerceDbContext : DbContext
+public class EcommerceDbContext(DbContextOptions<EcommerceDbContext> options) : DbContext(options)
 {
-    public EcommerceDbContext(DbContextOptions<EcommerceDbContext> options)
-        : base(options) { }
-
     public DbSet<Customer> Customers { get; set; }
     public DbSet<CustomerAddress> CustomerAddresses { get; set; }
     public DbSet<Order> Orders { get; set; }

@@ -1,13 +1,7 @@
 namespace Ecommerce.Application;
 
-public class CalculateShippingQueryItem
+public class CalculateShippingQueryItem(Guid idProduct, int quantity)
 {
-    public CalculateShippingQueryItem(Guid idProduct, int quantity)
-    {
-        IdProduct = idProduct;
-        Quantity = quantity;
-    }
-
-    public Guid IdProduct { get; set; }
-    public int Quantity { get; set; }
+    public Guid IdProduct { get; set; } = idProduct;
+    public int Quantity { get; set; } = quantity;
 }

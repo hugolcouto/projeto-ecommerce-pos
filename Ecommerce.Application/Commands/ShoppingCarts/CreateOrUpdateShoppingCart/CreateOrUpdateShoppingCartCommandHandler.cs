@@ -3,15 +3,10 @@ using Ecommerce.Infrastructure.Caching;
 
 namespace Ecommerce.Application.Commands.ShoppingCarts.CreateOrUpdateShoppingCart;
 
-public class CreateOrUpdateShoppingCartCommandHandler
-    : IHandler<CreateOrUpdateShoppingCartCommand, ResultViewModel<bool>>
+public class CreateOrUpdateShoppingCartCommandHandler(ICacheService cacheService)
+        : IHandler<CreateOrUpdateShoppingCartCommand, ResultViewModel<bool>>
 {
-    private readonly ICacheService _cacheService;
-
-    public CreateOrUpdateShoppingCartCommandHandler(ICacheService cacheService)
-    {
-        _cacheService = cacheService;
-    }
+    private readonly ICacheService _cacheService = cacheService;
 
     public async Task<ResultViewModel<bool>> HandleAsync(CreateOrUpdateShoppingCartCommand request)
     {

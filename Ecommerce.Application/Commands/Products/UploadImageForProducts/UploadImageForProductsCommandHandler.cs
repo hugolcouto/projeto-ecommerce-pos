@@ -5,20 +5,14 @@ using Ecommerce.Infrastructure;
 
 namespace Ecommerce.Application;
 
-public class UploadImageForProductsCommandHandler
-    : IHandler<UploadImageForProductsCommand, ResultViewModel<bool>>
-{
-    private readonly IStorageService _storageService;
-    private readonly IProductRepository _productRepository;
-
-    public UploadImageForProductsCommandHandler(
-        IStorageService storageService,
-        IProductRepository productRepository
+public class UploadImageForProductsCommandHandler(
+    IStorageService storageService,
+    IProductRepository productRepository
     )
-    {
-        _storageService = storageService;
-        _productRepository = productRepository;
-    }
+        : IHandler<UploadImageForProductsCommand, ResultViewModel<bool>>
+{
+    private readonly IStorageService _storageService = storageService;
+    private readonly IProductRepository _productRepository = productRepository;
 
     public async Task<ResultViewModel<bool>> HandleAsync(UploadImageForProductsCommand request)
     {

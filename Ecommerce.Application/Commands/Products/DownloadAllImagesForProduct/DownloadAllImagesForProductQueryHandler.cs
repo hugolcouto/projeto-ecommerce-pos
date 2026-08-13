@@ -8,15 +8,10 @@ using Microsoft.VisualBasic;
 
 namespace Ecommerce.Application.Commands.Products.DownloadAllImagesForProduct;
 
-public class DownloadAllImagesForProductQueryHandler
-    : IHandler<DownloadAllImagesForProductQuery, ResultViewModel<List<Stream>>>
+public class DownloadAllImagesForProductQueryHandler(IStorageService storageService)
+        : IHandler<DownloadAllImagesForProductQuery, ResultViewModel<List<Stream>>>
 {
-    private readonly IStorageService _storageService;
-
-    public DownloadAllImagesForProductQueryHandler(IStorageService storageService)
-    {
-        _storageService = storageService;
-    }
+    private readonly IStorageService _storageService = storageService;
 
     public async Task<ResultViewModel<List<Stream>>> HandleAsync(
         DownloadAllImagesForProductQuery request

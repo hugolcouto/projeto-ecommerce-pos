@@ -5,16 +5,10 @@ using Ecommerce.Infrastructure.Caching;
 
 namespace Ecommerce.Application.Commands.ProductsCommands.Products.CreateProduct;
 
-public class CreateProductCommandHandler : IHandler<CreateProductCommand, ResultViewModel<Guid>>
+public class CreateProductCommandHandler(IProductRepository repository, ICacheService cacheService) : IHandler<CreateProductCommand, ResultViewModel<Guid>>
 {
-    private readonly IProductRepository _repository;
-    private readonly ICacheService _cacheService;
-
-    public CreateProductCommandHandler(IProductRepository repository, ICacheService cacheService)
-    {
-        _repository = repository;
-        _cacheService = cacheService;
-    }
+    private readonly IProductRepository _repository = repository;
+    private readonly ICacheService _cacheService = cacheService;
 
     public async Task<ResultViewModel<Guid>> HandleAsync(CreateProductCommand request)
     {

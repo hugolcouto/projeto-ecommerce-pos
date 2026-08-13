@@ -2,12 +2,7 @@ using System;
 
 namespace Ecommerce.Core.Events;
 
-public class OrderCreatedEvent
+public class OrderCreatedEvent(Guid idOrder)
 {
-    public OrderCreatedEvent(Guid idOrder)
-    {
-        IdOrder = idOrder;
-    }
-
-    public Guid IdOrder { get; private set; }
+    public Guid IdOrder { get; private set; } = idOrder;
 }

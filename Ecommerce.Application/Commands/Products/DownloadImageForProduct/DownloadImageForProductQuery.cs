@@ -2,12 +2,7 @@ using System;
 
 namespace Ecommerce.Application.Commands.Products.DownloadImageForProduct;
 
-public class DownloadImageForProductQuery
+public class DownloadImageForProductQuery(Guid idProductImage)
 {
-    public DownloadImageForProductQuery(Guid idProductImage)
-    {
-        IdProductImage = idProductImage;
-    }
-
-    public Guid IdProductImage { get; set; }
+    public Guid IdProductImage { get; set; } = idProductImage;
 }

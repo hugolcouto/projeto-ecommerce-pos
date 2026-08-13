@@ -1,6 +1,8 @@
 using Ecommerce.Application;
 using Ecommerce.Core;
 using Ecommerce.Infrastructure;
+using Ecommerce.Infrastructure.BackgroundJobs;
+using Hangfire;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,19 @@ builder.Services.AddOpenApi();
 
 WebApplication? app = builder.Build();
 
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    IRecurringJobManager recurringJobs =
+        scope.ServiceProvider.GetService<IRecurringJobManager>()
+        ?? throw new InvalidOperationException("Hangfire not properly configured");
+
+    RecurringJob.AddOrUpdate<CanceledExpiredOrdersJob>(
+        "expire-orders",
+        job => job.ExecuteAsync(),
+        Cron.Daily()
+    );
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -22,6 +37,11 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
     app.MapGet("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
 }
+
+app.UseHangfireDashboard(
+    "/hangfire",
+    new DashboardOptions() { DashboardTitle = "EcommerceDev API Background Jobs" }
+);
 
 app.UseHttpsRedirection();
 

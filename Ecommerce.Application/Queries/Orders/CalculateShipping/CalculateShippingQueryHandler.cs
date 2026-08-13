@@ -7,23 +7,15 @@ using Microsoft.Extensions.Options;
 
 namespace Ecommerce.Application;
 
-public class CalculateShippingQueryHandler
-    : IHandler<CalculateShippingQuery, ResultViewModel<decimal>>
+public class CalculateShippingQueryHandler(
+    IGeolocationService geolocationService,
+    IOrderDomainService orderDomainService,
+    IOptions<GeolocationSettings> options
+) : IHandler<CalculateShippingQuery, ResultViewModel<decimal>>
 {
-    private readonly IGeolocationService _geolocationService;
-    private readonly IOrderDomainService _orderDomainService;
-    private readonly GeolocationSettings _geolocationSettings;
-
-    public CalculateShippingQueryHandler(
-        IGeolocationService geolocationService,
-        IOrderDomainService orderDomainService,
-        IOptions<GeolocationSettings> options
-    )
-    {
-        _geolocationService = geolocationService;
-        _orderDomainService = orderDomainService;
-        _geolocationSettings = options.Value;
-    }
+    private readonly IGeolocationService _geolocationService = geolocationService;
+    private readonly IOrderDomainService _orderDomainService = orderDomainService;
+    private readonly GeolocationSettings _geolocationSettings = options.Value;
 
     public async Task<ResultViewModel<decimal>> HandleAsync(CalculateShippingQuery request)
     {
@@ -32,10 +24,10 @@ public class CalculateShippingQueryHandler
             request.ZipCode
         );
 
-        List<OrderItem> items =
-        [
-            .. request.Items.Select(i => new OrderItem(i.IdProduct, i.Quantity, 0)),
-        ];
+        List<OrderItem> items = request.Items.ConvertAll(i => new OrderItem(
+            i.IdProduct,
+            i.Quantity
+        ));
 
         decimal totalShippingCost = _orderDomainService.CalculateShippingCost(distanceInKm, items);
 

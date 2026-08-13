@@ -1,13 +1,7 @@
 namespace Ecommerce.Application.Common.ShoppingCart;
 
-public class ProductItemShoppingCartModel
+public class ProductItemShoppingCartModel(Guid idProduct, int quantity)
 {
-    public ProductItemShoppingCartModel(Guid idProduct, int quantity)
-    {
-        IdProduct = idProduct;
-        Quantity = quantity;
-    }
-
-    public Guid IdProduct { get; set; }
-    public int Quantity { get; set; }
+    public Guid IdProduct { get; set; } = idProduct;
+    public int Quantity { get; set; } = quantity;
 }

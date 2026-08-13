@@ -5,15 +5,10 @@ using Ecommerce.Infrastructure.Caching;
 
 namespace Ecommerce.Application.Queries.ShoppingCarts;
 
-public class GetShoppingCartQueryHandler
-    : IHandler<GetShoppingCartQuery, ResultViewModel<List<ProductItemShoppingCartModel>>>
+public class GetShoppingCartQueryHandler(ICacheService cacheService)
+        : IHandler<GetShoppingCartQuery, ResultViewModel<List<ProductItemShoppingCartModel>>>
 {
-    private readonly ICacheService _cacheService;
-
-    public GetShoppingCartQueryHandler(ICacheService cacheService)
-    {
-        _cacheService = cacheService;
-    }
+    private readonly ICacheService _cacheService = cacheService;
 
     async Task<ResultViewModel<List<ProductItemShoppingCartModel>>> IHandler<
         GetShoppingCartQuery,

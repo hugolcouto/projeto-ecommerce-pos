@@ -6,11 +6,10 @@ public class OrderItem : BaseEntity
 {
     public OrderItem() { }
 
-    public OrderItem(Guid idProduct, int quantity, decimal price)
+    public OrderItem(Guid idProduct, int quantity)
     {
         IdProduct = idProduct;
         Quantity = quantity;
-        Price = price;
     }
 
     [Required]
@@ -26,4 +25,6 @@ public class OrderItem : BaseEntity
     public decimal Price { get; set; }
     public OrderItemReview Review { get; set; }
     public Product Product { get; set; }
+
+    public void SetItemPrice(decimal price) => Price = price;
 }

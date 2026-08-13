@@ -11,18 +11,13 @@ using RabbitMQ.Client.Events;
 
 namespace Ecommerce.Infrastructure.Messaging.Consumers;
 
-public class OrderCreatedEventConsumer : BackgroundService
+public class OrderCreatedEventConsumer(RabbitMqSettings settings, IServiceProvider serviceProvider)
+    : BackgroundService
 {
-    private readonly RabbitMqSettings _settings;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly RabbitMqSettings _settings = settings;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
     private IConnection _connection;
     private IChannel _channel;
-
-    public OrderCreatedEventConsumer(RabbitMqSettings settings, IServiceProvider serviceProvider)
-    {
-        _settings = settings;
-        _serviceProvider = serviceProvider;
-    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -54,7 +49,9 @@ public class OrderCreatedEventConsumer : BackgroundService
                     return;
                 }
 
-                order.MarkAsConfirmed();
+                // TODO: Implementar integração com gateway de pagamento
+
+                order.MarkAsPaymentPending();
 
                 await repository.UpdateAsync(order);
 

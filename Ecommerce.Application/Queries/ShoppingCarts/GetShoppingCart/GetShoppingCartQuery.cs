@@ -1,11 +1,6 @@
 namespace Ecommerce.Application.Queries.ShoppingCarts;
 
-public class GetShoppingCartQuery
+public class GetShoppingCartQuery(Guid idCustomer)
 {
-    public GetShoppingCartQuery(Guid idCustomer)
-    {
-        IdCustomer = idCustomer;
-    }
-
-    public Guid IdCustomer { get; set; }
+    public Guid IdCustomer { get; set; } = idCustomer;
 }

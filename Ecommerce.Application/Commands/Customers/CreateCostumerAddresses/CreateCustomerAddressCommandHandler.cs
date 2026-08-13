@@ -4,15 +4,10 @@ using Ecommerce.Core.Repositories;
 
 namespace Ecommerce.Application.Commands.ProductsCommands.Customers.CreateCostumerAddresses;
 
-public class CreateCustomerAddressCommandHandler
-    : IHandler<CreateCustomerAddressCommand, ResultViewModel<Guid>>
+public class CreateCustomerAddressCommandHandler(ICustomerRepository repository)
+        : IHandler<CreateCustomerAddressCommand, ResultViewModel<Guid>>
 {
-    private readonly ICustomerRepository _repository;
-
-    public CreateCustomerAddressCommandHandler(ICustomerRepository repository)
-    {
-        _repository = repository;
-    }
+    private readonly ICustomerRepository _repository = repository;
 
     public async Task<ResultViewModel<Guid>> HandleAsync(CreateCustomerAddressCommand request)
     {

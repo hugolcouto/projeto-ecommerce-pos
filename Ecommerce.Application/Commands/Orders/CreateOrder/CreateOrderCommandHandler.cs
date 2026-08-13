@@ -4,8 +4,10 @@ using Ecommerce.Core.Entities;
 using Ecommerce.Core.Events;
 using Ecommerce.Core.Repositories;
 using Ecommerce.Core.Services;
+using Ecommerce.Infrastructure.BackgroundJobs;
 using Ecommerce.Infrastructure.Geolocation;
 using Ecommerce.Infrastructure.Messaging;
+using Hangfire;
 using Microsoft.Extensions.Options;
 
 namespace Ecommerce.Application.Commands.Orders.CreateOrder;
@@ -16,7 +18,8 @@ public class CreateOrderCommandHandler(
     IGeolocationService geolocationService,
     IOptions<GeolocationSettings> geolocationSettings,
     IOrderDomainService orderDomainService,
-    ICustomerRepository? customerRepository
+    ICustomerRepository? customerRepository,
+    IBackgroundJobClient backgroundJobClient
 ) : IHandler<CreateOrderCommand, ResultViewModel<Guid>>
 {
     private readonly IOrderRepository _repository = repository;
@@ -24,11 +27,22 @@ public class CreateOrderCommandHandler(
     private readonly IGeolocationService _geolocationService = geolocationService;
     private readonly IOptions<GeolocationSettings> _geolocationSettings = geolocationSettings;
     private readonly IOrderDomainService _orderDomainService = orderDomainService;
-    readonly ICustomerRepository? _customerRepository = customerRepository;
+    private readonly ICustomerRepository? _customerRepository = customerRepository;
+    private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
     public async Task<ResultViewModel<Guid>> HandleAsync(CreateOrderCommand request)
     {
+        Customer? customer = await _customerRepository.GetById(request.IdCustomer);
         CustomerAddress? address = await _customerRepository.GetAddress(request.IdCustomer);
+
+        if (customer is null)
+        {
+            return ResultViewModel<Guid>.Error(
+                "Customer not found",
+                HttpStatusCode.NotFound,
+                Guid.Empty
+            );
+        }
 
         if (address is null)
         {
@@ -54,17 +68,28 @@ public class CreateOrderCommandHandler(
             request.IdCustomer,
             request.IdDeliveryAddress,
             totalShippingCost,
-            100.0m,
-            [.. request.Items.Select(i => new OrderItem(i.IdProduct, 5, 100m))]
+            request.Items.ConvertAll(i => new OrderItem(i.IdProduct, i.Quantity))
         );
 
         order.SetShippingCost(totalShippingCost);
+
+        await _orderDomainService.UpdateProductPrices(order);
+
+        decimal totalProductPrice = await _orderDomainService.CalculateProductOrderTotal(
+            order.Items
+        );
+
+        order.SetTotalProductPrice(totalProductPrice);
 
         await _repository.CreateAsync(order);
 
         OrderCreatedEvent @event = new(order.Id);
 
         await _eventPublisher.PublisherAsync(@event);
+
+        _backgroundJobClient.Enqueue<SendOrderconfirmationEmailJob>(job =>
+            job.ExecuteAsync(order.Id, customer.Email)
+        );
 
         return ResultViewModel<Guid>.Success(order.Id);
     }
@@ -76,10 +101,10 @@ public class CreateOrderCommandHandler(
             destination
         );
 
-        List<OrderItem> items =
-        [
-            .. request.Items.Select(i => new OrderItem(i.IdProduct, i.Quantity, 0)),
-        ];
+        List<OrderItem> items = request.Items.ConvertAll(i => new OrderItem(
+            i.IdProduct,
+            i.Quantity
+        ));
 
         decimal totalShippingCost = _orderDomainService.CalculateShippingCost(distanceInKm, items);
 

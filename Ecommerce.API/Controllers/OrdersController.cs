@@ -9,14 +9,9 @@ namespace Ecommerce.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Produces("application/json")]
-public class OrdersController : ControllerBase
+public class OrdersController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public OrdersController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
+    private readonly IMediator _mediator = mediator;
 
     [HttpPost]
     public async Task<IActionResult> Create(CreateOrderCommand request)

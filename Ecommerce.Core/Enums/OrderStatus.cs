@@ -2,11 +2,12 @@ namespace Ecommerce.Core.Enums;
 
 public enum OrderStatus
 {
-    Created,
-    Processing,
+    Created = 1,
+    PaymentPending,
     Confirmed,
-    Shipping,
+    Picking,
     Shipped,
     Delivered,
     Cancelled,
+    PaymentExpired,
 }

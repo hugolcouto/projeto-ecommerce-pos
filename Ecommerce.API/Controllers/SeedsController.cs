@@ -46,8 +46,7 @@ public class SeedsController : ControllerBase
             idCustomer: customer.Id,
             deliveryAddressId: customerAddress.Id,
             shippingPrice: 10,
-            totalPrice: product.Price * 2,
-            items: [new(idProduct: product.Id, quantity: 2, price: product.Price)]
+            items: [new(idProduct: product.Id, quantity: 2)]
         );
 
         var objects = new List<object> { customer, customerAddress, category, product, order };

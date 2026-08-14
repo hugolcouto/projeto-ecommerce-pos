@@ -13,4 +13,5 @@ Projeto de estudos para desenvolvimento de back-end de plataforma de ecommerce u
 - [x] Implementando cálculo de frete com API do Google
 - [x] Rotinas com Hangfire + base para Pagamentos com Stripe
 - [x] Implementando Pagamentos com Stripe
-- [ ] Testes Unitários | Ecommerce Dev Start
+- [x] Testes Unitários | Ecommerce Dev Start
+- [ ] SignalR e front-end

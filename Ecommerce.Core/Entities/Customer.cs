@@ -43,4 +43,5 @@ public class Customer : BaseEntity
     public List<CustomerAddress> Addresses { get; set; } = [];
     public List<Order> Orders { get; set; } = [];
     public List<OrderItemReview> Reviews { get; set; } = [];
+    public string? IdExternalPayment { get; set; }
 }

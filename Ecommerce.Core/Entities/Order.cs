@@ -48,6 +48,8 @@ public class Order : BaseEntity
 
     public Guid IdCustomer { get; init; }
     public List<OrderUpdate> Updates { get; } = [];
+    public string? IdExternalOrder { get; set; }
+    public string? PaymentUrl { get; set; }
 
     public void MarkAsPaymentPending()
     {

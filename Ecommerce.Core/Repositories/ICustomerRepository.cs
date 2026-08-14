@@ -8,4 +8,5 @@ public interface ICustomerRepository
     Task<Guid> CreateAddress(CustomerAddress address);
     Task<CustomerAddress?> GetAddress(Guid id);
     Task<Customer?> GetById(Guid id);
+    Task Update(Customer customer);
 }

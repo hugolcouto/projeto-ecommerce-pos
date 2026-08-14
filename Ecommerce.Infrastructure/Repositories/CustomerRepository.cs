@@ -31,4 +31,11 @@ public class CustomerRepository(EcommerceDbContext context) : ICustomerRepositor
 
     public Task<Customer?> GetById(Guid id) =>
         _context.Customers.SingleOrDefaultAsync(c => c.Id == id);
+
+    public async Task Update(Customer customer)
+    {
+        _context.Customers.Update(customer);
+
+        await _context.SaveChangesAsync();
+    }
 }

@@ -5,6 +5,7 @@ using Ecommerce.Infrastructure.Caching;
 using Ecommerce.Infrastructure.Geolocation;
 using Ecommerce.Infrastructure.Messaging;
 using Ecommerce.Infrastructure.Messaging.Consumers;
+using Ecommerce.Infrastructure.Payment;
 using Ecommerce.Infrastructure.Persistence;
 using Ecommerce.Infrastructure.Repositories;
 using Hangfire;
@@ -29,7 +30,8 @@ public static class InfrastructureModule
                 .AddStorage(configuration)
                 .AddCache(configuration)
                 .AddGeolocation(configuration)
-                .AddHangfireServices(configuration);
+                .AddHangfireServices(configuration)
+                .AddPaymentService(configuration);
 
             return services;
         }
@@ -77,7 +79,7 @@ public static class InfrastructureModule
                 configuration.GetConnectionString("BlobStorage")
                 ?? throw new InvalidOperationException("ConnectionString 'BlobStorage' not found");
 
-            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+            BlobServiceClient blobServiceClient = new(connectionString);
 
             services.AddSingleton(blobServiceClient);
 
@@ -151,6 +153,15 @@ public static class InfrastructureModule
             });
 
             services.AddHangfireServer();
+
+            return services;
+        }
+
+        private IServiceCollection AddPaymentService(IConfiguration configuration)
+        {
+            services.AddScoped<IPaymentService, StripePaymentService>();
+
+            services.Configure<PaymentSettings>(configuration.GetSection("Payment:Stripe"));
 
             return services;
         }

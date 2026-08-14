@@ -1,9 +1,9 @@
-using System;
 using System.Text;
 using System.Text.Json;
 using Ecommerce.Core.Entities;
 using Ecommerce.Core.Events;
 using Ecommerce.Core.Repositories;
+using Ecommerce.Infrastructure.Payment;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
@@ -38,10 +38,10 @@ public class OrderCreatedEventConsumer(RabbitMqSettings settings, IServiceProvid
                 );
 
                 IServiceScope? scope = _serviceProvider.CreateScope();
-                IOrderRepository? repository =
+                IOrderRepository? orderRepository =
                     scope.ServiceProvider.GetRequiredService<IOrderRepository>();
 
-                Order? order = await repository.GetByIdAsync(@event.IdOrder);
+                Order? order = await orderRepository.GetByIdAsync(@event.IdOrder);
 
                 if (order is null)
                 {
@@ -49,11 +49,60 @@ public class OrderCreatedEventConsumer(RabbitMqSettings settings, IServiceProvid
                     return;
                 }
 
-                // TODO: Implementar integração com gateway de pagamento
+                IPaymentService paymentService =
+                    scope.ServiceProvider.GetRequiredService<IPaymentService>();
+
+                ICustomerRepository customerRepository =
+                    scope.ServiceProvider.GetRequiredService<ICustomerRepository>();
+
+                Customer? customer = await customerRepository.GetById(order.IdCustomer);
+
+                PaymentCustomerModel customerPaymentModel = new()
+                {
+                    Email = customer.Email,
+                    FullName = customer.FullName,
+                    PhoneNumber = customer.PhoneNumber,
+                };
+
+                string? customerPaymentId;
+
+                if (customer.IdExternalPayment is not null)
+                {
+                    customerPaymentId = customer.IdExternalPayment;
+                }
+                else
+                {
+                    customerPaymentId = await paymentService.CreateCustomerAsync(
+                        customerPaymentModel
+                    );
+
+                    customer.IdExternalPayment = customerPaymentId;
+
+                    await customerRepository.Update(customer);
+                }
+
+                PaymentOrderModel paymentOrderModel = new()
+                {
+                    IdExternalCustomer = customerPaymentId,
+                    Items = order.Items.ConvertAll(oi => new PaymentOrderItemModel
+                    {
+                        Name = oi.Product.Title,
+                        Price = oi.Price,
+                        Quantity = oi.Quantity,
+                    }),
+                };
+
+                PaymentOrderResponseModel paymentResult = await paymentService.CreateOrderAsync(
+                    paymentOrderModel
+                );
 
                 order.MarkAsPaymentPending();
 
-                await repository.UpdateAsync(order);
+                order.IdExternalOrder = paymentResult.Id;
+                order.PaymentUrl = paymentResult.Url;
+                await orderRepository.UpdateAsync(order);
+
+                // TODO: SignalR Para retorno do link de pagamento
 
                 Console.WriteLine($"[Consumer] Order with ID {@event.IdOrder} updated");
 
